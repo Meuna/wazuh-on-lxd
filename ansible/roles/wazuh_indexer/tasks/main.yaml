@@ -1,0 +1,83 @@
+---
+- name: install docker.io package
+  ansible.builtin.package:
+    name: docker.io
+    state: present
+
+- name: create /etc/wazuh folder
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/wazuh
+    - /etc/wazuh/indexer
+
+- ansible.builtin.include_tasks: tls.yaml
+  loop:
+    - { key: /etc/wazuh/indexer/indexer.key, crt: /etc/wazuh/indexer/indexer.crt, cn: 'indexer - {{ inventory_hostname }}' }
+    - { key: /etc/wazuh/indexer/admin.key, crt: /etc/wazuh/indexer/admin.crt, cn: admin }
+
+- name: run get_ca task from pki role
+  ansible.builtin.import_role:
+    name: pki
+    tasks_from: get_ca
+  vars:
+    crt_path: /etc/wazuh/indexer/root-ca.crt
+
+- name: create internal_users.yml file
+  ansible.builtin.template:
+    src: internal_users.yml.j2
+    dest: /etc/wazuh/indexer/internal_users.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh.indexer
+
+- name: create wazuh.indexer.yml file
+  ansible.builtin.template:
+    src: wazuh.indexer.yml.j2
+    dest: /etc/wazuh/indexer/wazuh.indexer.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh.indexer
+
+- name: create wazuh-indexer volume
+  community.docker.docker_volume:
+    name: wazuh-indexer
+
+- name: change keys ownership to wazuh-indexer
+  community.docker.docker_container:
+    name: wazuh.indexer-chwown-key
+    auto_remove: yes
+    user: root
+    image: wazuh/wazuh-indexer:4.12.0
+    volumes:
+      - /etc/wazuh/indexer/indexer.key:/usr/share/wazuh-indexer/certs/wazuh.indexer.key
+    entrypoint:
+      - chown
+      - wazuh-indexer:wazuh-indexer
+      - /usr/share/wazuh-indexer/certs/wazuh.indexer.key
+
+- name: create wazuh.indexer container
+  community.docker.docker_container:
+    name: wazuh.indexer
+    image: wazuh/wazuh-indexer:4.12.0
+    published_ports:
+      - '{{ indexer_port }}:{{ indexer_port }}'
+    volumes:
+      - wazuh-indexer:/var/lib/wazuh-indexer
+      - /etc/wazuh/indexer/root-ca.crt:/usr/share/wazuh-indexer/certs/root-ca.crt
+      - /etc/wazuh/indexer/indexer.crt:/usr/share/wazuh-indexer/certs/wazuh.indexer.crt
+      - /etc/wazuh/indexer/indexer.key:/usr/share/wazuh-indexer/certs/wazuh.indexer.key
+      - /etc/wazuh/indexer/admin.crt:/usr/share/wazuh-indexer/certs/admin.crt
+      - /etc/wazuh/indexer/admin.key:/usr/share/wazuh-indexer/certs/admin.key
+      - /etc/wazuh/indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml
+      - /etc/wazuh/indexer/internal_users.yml:/usr/share/wazuh-indexer/opensearch-security/internal_users.yml
+    restart_policy: always
+    detach: yes
+    env:
+      OPENSEARCH_JAVA_OPTS: '-Xms1g -Xmx1g'

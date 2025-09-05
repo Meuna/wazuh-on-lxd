@@ -13,3 +13,9 @@
       ansible.builtin.import_role:
         name: pki
         tasks_from: trust
+
+- hosts: wazuh_indexer
+  become: true
+
+  roles:
+    - wazuh_indexer
