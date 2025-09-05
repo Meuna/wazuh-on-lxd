@@ -1,0 +1,44 @@
+# "Call" this task file using using include/import,
+# and variable defined following the example.
+# 
+# Example:
+#
+# - name: run sign task from pki role
+#   ansible.builtin.import_role:
+#     name: pki
+#     tasks_from: sign
+#   vars:
+#     csr_content: '{{ openssl_csr_pipe_result.csr }}'
+#     crt_path: '{{ etcd_home }}/node.crt'
+#     crt_owner: 'root'
+#     crt_group: 'root'
+#     crt_mode: '0644'
+---
+- name: signed certificate from CSR on the pki host
+  community.crypto.x509_certificate:
+    path: '{{ pki_home }}/tmp/{{ inventory_hostname }}.crt'
+    csr_content: '{{ csr_content }}'
+    ownca_path: '{{ pki_ca }}'
+    ownca_privatekey_path: '{{ pki_key }}'
+    provider: ownca
+    return_content: yes
+    force: yes
+    mode: '0644'
+    owner: root
+    group: root
+  delegate_to: '{{ groups.pki[0] }}'
+  register: x509_certificate_result
+
+- name: remove pki local copy
+  ansible.builtin.file:
+    path: '{{ pki_home }}/tmp/{{ inventory_hostname }}.crt'
+    state: absent
+  delegate_to: '{{ groups.pki[0] }}'
+
+- name: write certificate on the calling host
+  ansible.builtin.copy:
+    content: '{{ x509_certificate_result.certificate }}'
+    dest: '{{ crt_path }}'
+    owner: '{{ crt_owner | default("root") }}'
+    group: '{{ crt_group | default("root")  }}'
+    mode: '{{ crt_mode | default("0644")  }}'

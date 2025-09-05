@@ -1,0 +1,5 @@
+---
+pki_country: FR
+pki_state: Occitanie
+pki_locality: Toulouse
+domain: wazuh.local

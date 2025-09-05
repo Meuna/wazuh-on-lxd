@@ -1,0 +1,15 @@
+---
+- hosts: pki
+  become: true
+
+  roles:
+    - pki
+
+- hosts: all
+  become: true
+
+  tasks:
+    - name: run trust task from pki role
+      ansible.builtin.import_role:
+        name: pki
+        tasks_from: trust

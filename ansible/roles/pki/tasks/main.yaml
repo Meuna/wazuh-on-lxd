@@ -1,0 +1,43 @@
+---
+- name: create pki folder structure
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - '{{ pki_home }}'
+    - '{{ pki_home }}/tmp'
+
+- name: create TLS private key
+  community.crypto.openssl_privatekey:
+    path: '{{ pki_key }}'
+    mode: '0600'
+    owner: root
+    group: root
+
+- name: create certificate signing request
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: '{{ pki_key }}'
+    common_name: Root CA for vm-grafana-on-lxd
+    country_name: '{{ pki_country }}'
+    state_or_province_name: '{{ pki_state }}'
+    locality_name: '{{ pki_locality }}'
+    basic_constraints: CA:TRUE
+    key_usage:
+      - cRLSign
+      - keyCertSign
+    use_common_name_for_san: false
+  register: openssl_csr_pipe_result
+  changed_when: no
+
+- name: create self-signed certificate from CSR
+  community.crypto.x509_certificate:
+    path: '{{ pki_ca }}'
+    csr_content: "{{ openssl_csr_pipe_result.csr }}"
+    privatekey_path: '{{ pki_key }}'
+    provider: selfsigned
+    mode: '0644'
+    owner: root
+    group: root

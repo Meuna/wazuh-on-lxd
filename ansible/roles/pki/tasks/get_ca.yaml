@@ -1,0 +1,27 @@
+# "Call" this task file using using include/import,
+# and variable defined following the example.
+# 
+# Example:
+#
+# - name: run get_ca task from pki role
+#   ansible.builtin.import_role:
+#     name: pki
+#     tasks_from: get_ca
+#   vars:
+#     crt_path: '{{ etcd_home }}/ca.crt'
+#     crt_owner: 'root'
+#     crt_group: 'root'
+#     crt_mode: '0644'
+---
+- name: read CA content from pki
+  ansible.builtin.slurp: src={{ pki_ca }}
+  register: slurp_result
+  delegate_to: '{{ groups.pki[0] }}'
+
+- name: write CA on the calling host
+  ansible.builtin.copy:
+    content: '{{ slurp_result.content | b64decode }}'
+    dest: '{{ crt_path | default }}'
+    owner: '{{ crt_owner | default("root") }}'
+    group: '{{ crt_group | default("root")  }}'
+    mode: '{{ crt_mode | default("0644")  }}'

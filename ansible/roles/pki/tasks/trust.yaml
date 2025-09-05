@@ -1,0 +1,17 @@
+# "Call" this task file using using include/import,
+# and variable defined following the example.
+# 
+# Example:
+#
+# - name: run trust task from pki role
+#   ansible.builtin.import_role:
+#     name: pki
+#     tasks_from: trust
+---
+- name: copy CA to /usr/local/share/ca-certificates
+  ansible.builtin.import_tasks: get_ca.yaml
+  vars:
+    crt_path: /usr/local/share/ca-certificates/wazuh-ca.crt
+
+- name: update trust store
+  ansible.builtin.command: update-ca-certificates

@@ -1,0 +1,4 @@
+---
+pki_home: /opt/pki
+pki_key: '{{ pki_home }}/ca.key'
+pki_ca: '{{ pki_home }}/ca.crt'
