@@ -64,6 +64,7 @@ resource "lxd_profile" "wazuh" {
     properties = {
       pool = lxd_storage_pool.wazuh.name
       path = "/"
+      size = "20GiB"
     }
   }
 
