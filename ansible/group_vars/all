@@ -4,4 +4,9 @@ pki_state: Occitanie
 pki_locality: Toulouse
 domain: wazuh.local
 indexer_port: '9200'
-userpw: easypass
+syslog_port: '514'
+agent_com_port: '1514'
+agent_enrollment_port: '1515'
+cluster_port: '1516'
+api_enrollment_port: '55000'
+mainpw: easypass

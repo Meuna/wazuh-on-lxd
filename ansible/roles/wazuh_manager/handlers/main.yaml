@@ -1,0 +1,3 @@
+---
+- name: restart wazuh.manager
+  community.docker.docker_container: name=wazuh.manager restart=yes

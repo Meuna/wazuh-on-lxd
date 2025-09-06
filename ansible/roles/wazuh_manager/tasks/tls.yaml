@@ -2,7 +2,6 @@
 - name: create TLS private key
   community.crypto.openssl_privatekey:
     path: '{{ item.key }}'
-    format: pkcs8
     mode: '0600'
     owner: root
     group: root

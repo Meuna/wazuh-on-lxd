@@ -17,8 +17,8 @@
 
 - ansible.builtin.include_tasks: tls.yaml
   loop:
-    - { key: /etc/wazuh/indexer/indexer.key, crt: /etc/wazuh/indexer/indexer.crt, cn: 'indexer - {{ inventory_hostname }}' }
-    - { key: /etc/wazuh/indexer/admin.key, crt: /etc/wazuh/indexer/admin.crt, cn: admin }
+    - { key: /etc/wazuh/indexer/indexer.key, crt: /etc/wazuh/indexer/indexer.crt, cn: 'indexer - {{ inventory_hostname }}', eku: ['serverAuth'] }
+    - { key: /etc/wazuh/indexer/admin.key, crt: /etc/wazuh/indexer/admin.crt, cn: admin, eku: ['clientAuth'] }
 
 - name: run get_ca task from pki role
   ansible.builtin.import_role:

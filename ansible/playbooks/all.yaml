@@ -19,3 +19,9 @@
 
   roles:
     - wazuh_indexer
+
+- hosts: wazuh_manager
+  become: true
+
+  roles:
+    - wazuh_manager

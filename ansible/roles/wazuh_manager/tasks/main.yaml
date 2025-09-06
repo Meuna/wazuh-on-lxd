@@ -1,0 +1,115 @@
+---
+- name: install docker.io package
+  ansible.builtin.package:
+    name: docker.io
+    state: present
+
+- name: create /etc/wazuh folder
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/wazuh
+    - /etc/wazuh/manager
+
+- ansible.builtin.include_tasks: tls.yaml
+  loop:
+    - { key: /etc/wazuh/manager/filebeat.key, crt: /etc/wazuh/manager/filebeat.crt, cn: 'filebeat - {{ inventory_hostname }}', eku: ['clientAuth'] }
+
+- name: run get_ca task from pki role
+  ansible.builtin.import_role:
+    name: pki
+    tasks_from: get_ca
+  vars:
+    crt_path: /etc/wazuh/manager/root-ca.crt
+
+- name: create ossec.conf file
+  ansible.builtin.template:
+    src: ossec.conf.j2
+    dest: /etc/wazuh/manager/ossec.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh.manager
+
+- name: create filebeat.yml file
+  ansible.builtin.template:
+    src: filebeat.yml.j2
+    dest: /etc/wazuh/manager/filebeat.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh.manager
+
+- name: check if /etc/wazuh/manager/apipw file exists
+  stat:
+    path: /etc/wazuh/manager/apipw
+  register: stat_result
+
+- name: create /etc/wazuh/manager/apipw file
+  ansible.builtin.copy:
+    content: '{{ lookup("community.general.random_string", length=32, override_special=punctuation,  min_lower=1, min_upper=1, min_special=1, min_numeric=1) }}'
+    dest: /etc/wazuh/manager/apipw
+    owner: root
+    group: root
+    mode: '0600'
+  vars:
+    punctuation: '%&()*+,-./:;<=>?@[]^_{|}~'
+  when: not stat_result.stat.exists
+
+- ansible.builtin.slurp:
+    src: /etc/wazuh/manager/apipw
+  register: slurped_apipw
+
+- name: create wazuh.manager volumes
+  community.docker.docker_volume:
+    name: '{{ item }}'
+  loop:
+    - wazuh_api_configuration
+    - wazuh_etc
+    - wazuh_logs
+    - wazuh_queue
+    - wazuh_var_multigroups
+    - wazuh_integrations
+    - wazuh_active_response
+    - wazuh_agentless
+    - wazuh_wodles
+    - filebeat_etc
+    - filebeat_var
+
+- name: create wazuh.manager container
+  community.docker.docker_container:
+    name: wazuh.manager
+    image: wazuh/wazuh-manager:4.12.0
+    published_ports:
+      - '{{ syslog_port }}:{{ syslog_port }}'
+      - '{{ agent_com_port }}:{{ agent_com_port }}'
+      - '{{ agent_enrollment_port }}:{{ agent_enrollment_port }}'
+      - '{{ api_enrollment_port }}:{{ api_enrollment_port }}'
+    volumes:
+      - wazuh_api_configuration:/var/ossec/api/configuration
+      - wazuh_etc:/var/ossec/etc
+      - wazuh_logs:/var/ossec/logs
+      - wazuh_queue:/var/ossec/queue
+      - wazuh_var_multigroups:/var/ossec/var/multigroups
+      - wazuh_integrations:/var/ossec/integrations
+      - wazuh_active_response:/var/ossec/active-response/bin
+      - wazuh_agentless:/var/ossec/agentless
+      - wazuh_wodles:/var/ossec/wodles
+      - filebeat_etc:/etc/filebeat
+      - filebeat_var:/var/lib/filebeat
+      - /etc/wazuh/manager/root-ca.crt:/etc/ssl/root-ca.crt
+      - /etc/wazuh/manager/filebeat.crt:/etc/ssl/filebeat.crt
+      - /etc/wazuh/manager/filebeat.key:/etc/ssl/filebeat.key
+      - /etc/wazuh/manager/filebeat.yml:/etc/filebeat/filebeat.yml
+      - /etc/wazuh/manager/ossec.conf:/wazuh-config-mount/etc/ossec.conf
+    env:
+      INDEXER_USERNAME: admin
+      INDEXER_PASSWORD: '{{ mainpw }}'
+      API_USERNAME: admin
+      API_PASSWORD: '{{ slurped_apipw.content | b64decode }}'
+    restart_policy: always
+    detach: yes

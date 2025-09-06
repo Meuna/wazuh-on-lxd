@@ -11,19 +11,19 @@ _meta:
 ## Demo users
 
 admin:
-  hash: "{{ userpw | password_hash(hashtype='bcrypt') }}"
+  hash: "{{ mainpw | password_hash(hashtype='bcrypt') }}"
   reserved: true
   backend_roles:
   - "admin"
   description: "Demo admin user"
 
 kibanaserver:
-  hash: "{{ userpw | password_hash(hashtype='bcrypt') }}"
+  hash: "{{ mainpw | password_hash(hashtype='bcrypt') }}"
   reserved: true
   description: "Demo kibanaserver user"
 
 kibanaro:
-  hash: "{{ userpw | password_hash(hashtype='bcrypt') }}"
+  hash: "{{ mainpw | password_hash(hashtype='bcrypt') }}"
   reserved: false
   backend_roles:
   - "kibanauser"
@@ -31,21 +31,21 @@ kibanaro:
   description: "Demo kibanaro user"
 
 logstash:
-  hash: "{{ userpw | password_hash(hashtype='bcrypt') }}"
+  hash: "{{ mainpw | password_hash(hashtype='bcrypt') }}"
   reserved: false
   backend_roles:
   - "logstash"
   description: "Demo logstash user"
 
 readall:
-  hash: "{{ userpw | password_hash(hashtype='bcrypt') }}"
+  hash: "{{ mainpw | password_hash(hashtype='bcrypt') }}"
   reserved: false
   backend_roles:
   - "readall"
   description: "Demo readall user"
 
 snapshotrestore:
-  hash: "{{ userpw | password_hash(hashtype='bcrypt') }}"
+  hash: "{{ mainpw | password_hash(hashtype='bcrypt') }}"
   reserved: false
   backend_roles:
   - "snapshotrestore"
