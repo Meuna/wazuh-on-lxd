@@ -25,3 +25,9 @@
 
   roles:
     - wazuh_manager
+
+- hosts: wazuh_dashboard
+  become: true
+
+  roles:
+    - wazuh_dashboard

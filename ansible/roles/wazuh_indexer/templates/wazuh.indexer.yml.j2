@@ -6,11 +6,11 @@ path.logs: /var/log/wazuh-indexer
 discovery.type: single-node
 http.port: {{ indexer_port }}
 transport.tcp.port: 9300-9399
-plugins.security.ssl.http.pemcert_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.crt
-plugins.security.ssl.http.pemkey_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.key
+plugins.security.ssl.http.pemcert_filepath: /usr/share/wazuh-indexer/certs/indexer.crt
+plugins.security.ssl.http.pemkey_filepath: /usr/share/wazuh-indexer/certs/indexer.key
 plugins.security.ssl.http.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.crt
-plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.crt
-plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/certs/wazuh.indexer.key
+plugins.security.ssl.transport.pemcert_filepath: /usr/share/wazuh-indexer/certs/indexer.crt
+plugins.security.ssl.transport.pemkey_filepath: /usr/share/wazuh-indexer/certs/indexer.key
 plugins.security.ssl.transport.pemtrustedcas_filepath: /usr/share/wazuh-indexer/certs/root-ca.crt
 plugins.security.ssl.http.enabled: true
 plugins.security.ssl.transport.enforce_hostname_verification: false

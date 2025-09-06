@@ -1,0 +1,4 @@
+---
+- ansible.builtin.slurp:
+    src: /etc/wazuh/manager/apipw
+  register: slurped_apipw

@@ -1,0 +1,92 @@
+---
+- name: install docker.io package
+  ansible.builtin.package:
+    name: docker.io
+    state: present
+
+- name: create /etc/wazuh folder
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - /etc/wazuh
+    - /etc/wazuh/dashboard
+
+- ansible.builtin.include_tasks: tls.yaml
+  loop:
+    - { key: /etc/wazuh/dashboard/dashboard.key, crt: /etc/wazuh/dashboard/dashboard.crt, cn: 'dashboard - {{ inventory_hostname }}', eku: ['serverAuth'] }
+
+- name: run get_ca task from pki role
+  ansible.builtin.import_role:
+    name: pki
+    tasks_from: get_ca
+  vars:
+    crt_path: /etc/wazuh/dashboard/root-ca.crt
+
+- name: run slurp_apipw task from pki role
+  ansible.builtin.import_role:
+    name: wazuh_manager
+    tasks_from: slurp_apipw
+
+- name: create opensearch_dashboards.yml file
+  ansible.builtin.template:
+    src: opensearch_dashboards.yml.j2
+    dest: /etc/wazuh/dashboard/opensearch_dashboards.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh.dashboard
+
+- name: create wazuh.yml file
+  ansible.builtin.template:
+    src: wazuh.yml.j2
+    dest: /etc/wazuh/dashboard/wazuh.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh.dashboard
+
+- name: create wazuh.dashboard volumes
+  community.docker.docker_volume:
+    name: '{{ item }}'
+  loop:
+    - wazuh_dashboard_config
+    - wazuh_dashboard_custom
+
+- name: change keys ownership to wazuh-dashboard
+  community.docker.docker_container:
+    name: wazuh.dashboard-chwown-key
+    auto_remove: yes
+    user: root
+    image: wazuh/wazuh-dashboard:4.12.0
+    volumes:
+      - /etc/wazuh/dashboard/dashboard.key:/usr/share/wazuh-dashboard/certs/dashboard.key
+    entrypoint:
+      - chown
+      - wazuh-dashboard:wazuh-dashboard
+      - /usr/share/wazuh-dashboard/certs/dashboard.key
+
+- name: create wazuh.dashboard container
+  community.docker.docker_container:
+    name: wazuh.dashboard
+    image: wazuh/wazuh-dashboard:4.12.0
+    published_ports:
+      - '{{ dashboard_port }}:{{ dashboard_port }}'
+    volumes:
+      - wazuh_dashboard_config:/usr/share/wazuh-dashboard/data/wazuh/config
+      - wazuh_dashboard_custom:/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
+      - /etc/wazuh/dashboard/root-ca.crt:/usr/share/wazuh-dashboard/certs/root-ca.crt
+      - /etc/wazuh/dashboard/dashboard.crt:/usr/share/wazuh-dashboard/certs/dashboard.crt
+      - /etc/wazuh/dashboard/dashboard.key:/usr/share/wazuh-dashboard/certs/dashboard.key
+      - /etc/wazuh/dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
+      - /etc/wazuh/dashboard/wazuh.yml:/usr/share/wazuh-dashboard/data/wazuh/config/wazuh.yml
+    env:
+      INDEXER_USERNAME: admin
+      INDEXER_PASSWORD: '{{ mainpw }}'
+      DASHBOARD_USERNAME: admin
+      DASHBOARD_PASSWORD: '{{ mainpw }}'
+    restart_policy: always
+    detach: yes

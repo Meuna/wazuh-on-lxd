@@ -1,0 +1,7 @@
+hosts:
+  - 1513629884013:
+      url: "https://{{ groups['wazuh_manager'][0] }}"
+      port: {{ wazuh_api_port }}
+      username: admin
+      password: "{{ slurped_apipw.content | b64decode }}"
+      run_as: false

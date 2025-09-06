@@ -88,7 +88,7 @@
       - '{{ syslog_port }}:{{ syslog_port }}'
       - '{{ agent_com_port }}:{{ agent_com_port }}'
       - '{{ agent_enrollment_port }}:{{ agent_enrollment_port }}'
-      - '{{ api_enrollment_port }}:{{ api_enrollment_port }}'
+      - '{{ wazuh_api_port }}:{{ wazuh_api_port }}'
     volumes:
       - wazuh_api_configuration:/var/ossec/api/configuration
       - wazuh_etc:/var/ossec/etc

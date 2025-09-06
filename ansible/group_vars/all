@@ -8,5 +8,6 @@ syslog_port: '514'
 agent_com_port: '1514'
 agent_enrollment_port: '1515'
 cluster_port: '1516'
-api_enrollment_port: '55000'
+wazuh_api_port: '55000'
+dashboard_port: '5601'
 mainpw: easypass
