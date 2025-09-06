@@ -20,7 +20,7 @@
 - name: create certificate signing request
   community.crypto.openssl_csr_pipe:
     privatekey_path: '{{ pki_key }}'
-    common_name: Root CA for vm-grafana-on-lxd
+    common_name: Root CA for wazuh-on-lxd
     country_name: '{{ pki_country }}'
     state_or_province_name: '{{ pki_state }}'
     locality_name: '{{ pki_locality }}'
