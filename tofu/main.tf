@@ -64,7 +64,6 @@ resource "lxd_profile" "wazuh" {
     properties = {
       pool = lxd_storage_pool.wazuh.name
       path = "/"
-      size = "20GiB"
     }
   }
 
@@ -81,6 +80,16 @@ resource "lxd_instance" "wazuh" {
   profiles = [lxd_profile.wazuh.name]
   limits = {
     memory = "4GiB"
+  }
+  device {
+    type = "disk"
+    name = "root"
+
+    properties = {
+      pool = lxd_storage_pool.wazuh.name
+      path = "/"
+      size = "50GiB"
+    }
   }
 }
 
