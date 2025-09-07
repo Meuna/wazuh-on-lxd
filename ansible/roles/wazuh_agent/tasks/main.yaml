@@ -1,0 +1,37 @@
+---
+- name: download Wazuh key (ASCII armored)
+  ansible.builtin.uri:
+    url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+    return_content: yes
+  register: uri_result
+
+- name: dearmor Wazuh key
+  ansible.builtin.shell:
+    cmd: gpg --dearmor > /etc/apt/keyrings/wazuh.gpg
+    stdin: '{{ uri_result.content }}'
+    creates: /etc/apt/keyrings/wazuh.gpg
+
+- name: add Wazuh repo
+  ansible.builtin.apt_repository:
+    filename: wazuh.list
+    repo: 'deb [signed-by=/etc/apt/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main'
+
+- name: install wazuh-agent package
+  ansible.builtin.package:
+    name: wazuh-agent
+    state: present
+
+- name: create ossec.conf file
+  ansible.builtin.template:
+    src: ossec.conf.j2
+    dest: /var/ossec/etc/ossec.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart wazuh-agent
+
+- name: start wazuh-agent service
+  ansible.builtin.service:
+    name: wazuh-agent
+    state: started
+    enabled: yes

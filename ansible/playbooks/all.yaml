@@ -31,3 +31,9 @@
 
   roles:
     - wazuh_dashboard
+
+- hosts: wazuh_agent
+  become: true
+
+  roles:
+    - wazuh_agent
