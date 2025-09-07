@@ -1,0 +1,9 @@
+# Forward all messages to a remote server using TCP.
+# The linked-list queue prevents blocking if the server is temporarily unreachable.
+action(
+    type="omfwd"
+    protocol="tcp"
+    target="{{ groups['wazuh_manager'][0] }}"
+    port="{{ syslog_port }}"
+    queue.type="linkedList"
+)

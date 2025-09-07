@@ -37,3 +37,9 @@
 
   roles:
     - wazuh_agent
+
+- hosts: syslog_client
+  become: true
+
+  roles:
+    - syslog_client

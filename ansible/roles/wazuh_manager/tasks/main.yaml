@@ -71,6 +71,7 @@
     - wazuh_api_configuration
     - wazuh_etc
     - wazuh_logs
+    - wazuh_archives
     - wazuh_queue
     - wazuh_var_multigroups
     - wazuh_integrations
@@ -93,6 +94,7 @@
       - wazuh_api_configuration:/var/ossec/api/configuration
       - wazuh_etc:/var/ossec/etc
       - wazuh_logs:/var/ossec/logs
+      - wazuh_archives:/var/ossec/logs/archives
       - wazuh_queue:/var/ossec/queue
       - wazuh_var_multigroups:/var/ossec/var/multigroups
       - wazuh_integrations:/var/ossec/integrations
