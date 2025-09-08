@@ -21,6 +21,20 @@
     name: wazuh-agent
     state: present
 
+- ansible.builtin.include_tasks: tls.yaml
+  vars:
+    key: /var/ossec/etc/agent.key
+    crt: /var/ossec/etc/agent.crt
+    cn: 'wazuh-agent - {{ inventory_hostname }}'
+    eku: ['clientAuth']
+
+- name: run get_ca task from pki role
+  ansible.builtin.import_role:
+    name: pki
+    tasks_from: get_ca
+  vars:
+    crt_path: /var/ossec/etc/root-ca.crt
+
 - name: create ossec.conf file
   ansible.builtin.template:
     src: ossec.conf.j2

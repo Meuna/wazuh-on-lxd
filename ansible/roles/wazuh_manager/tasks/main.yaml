@@ -18,6 +18,7 @@
 - ansible.builtin.include_tasks: tls.yaml
   loop:
     - { key: /etc/wazuh/manager/filebeat.key, crt: /etc/wazuh/manager/filebeat.crt, cn: 'filebeat - {{ inventory_hostname }}', eku: ['clientAuth'] }
+    - { key: /etc/wazuh/manager/auth.key, crt: /etc/wazuh/manager/auth.crt, cn: '{{ inventory_hostname }}', eku: ['serverAuth'] }
 
 - name: run get_ca task from pki role
   ansible.builtin.import_role:
@@ -106,6 +107,8 @@
       - /etc/wazuh/manager/root-ca.crt:/etc/ssl/root-ca.crt
       - /etc/wazuh/manager/filebeat.crt:/etc/ssl/filebeat.crt
       - /etc/wazuh/manager/filebeat.key:/etc/ssl/filebeat.key
+      - /etc/wazuh/manager/auth.crt:/etc/ssl/auth.crt
+      - /etc/wazuh/manager/auth.key:/etc/ssl/auth.key
       - /etc/wazuh/manager/filebeat.yml:/etc/filebeat/filebeat.yml
       - /etc/wazuh/manager/ossec.conf:/wazuh-config-mount/etc/ossec.conf
     env:

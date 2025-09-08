@@ -31,3 +31,4 @@
   vars:
     csr_content: '{{ openssl_csr_pipe_result.csr }}'
     crt_path: '{{ item.crt }}'
+  notify: restart wazuh.manager

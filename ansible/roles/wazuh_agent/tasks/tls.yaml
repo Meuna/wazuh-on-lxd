@@ -1,15 +1,15 @@
 ---
 - name: create TLS private key
   community.crypto.openssl_privatekey:
-    path: '{{ item.key }}'
+    path: '{{ key }}'
     mode: '0600'
-    owner: root
-    group: root
+    owner: wazuh
+    group: wazuh
 
 - name: create certificate signing request
   community.crypto.openssl_csr_pipe:
-    privatekey_path: '{{ item.key }}'
-    common_name: '{{ item.cn }}'
+    privatekey_path: '{{ key }}'
+    common_name: '{{ cn }}'
     country_name: '{{ pki_country }}'
     state_or_province_name: '{{ pki_state }}'
     locality_name: '{{ pki_locality }}'
@@ -17,7 +17,7 @@
       - digitalSignature
       - keyEncipherment
     key_usage_critical: true
-    extended_key_usage: '{{ item.eku }}'
+    extended_key_usage: '{{ eku }}'
     subject_alt_name:
       - IP:{{ ansible_default_ipv4.address }}
       - DNS:{{ inventory_hostname }}
@@ -30,5 +30,5 @@
     tasks_from: sign
   vars:
     csr_content: '{{ openssl_csr_pipe_result.csr }}'
-    crt_path: '{{ item.crt }}'
-  notify: restart wazuh.dashboard
+    crt_path: '{{ crt }}'
+  notify: restart wazuh-agent

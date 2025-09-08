@@ -7,6 +7,11 @@
       <protocol>tcp</protocol>
     </server>
 {% endfor %}
+   <enrollment>
+      <server_ca_path>/var/ossec/etc/root-ca.crt</server_ca_path>
+      <agent_certificate_path>/var/ossec/etc/agent.crt</agent_certificate_path>
+      <agent_key_path>/var/ossec/etc/agent.key</agent_key_path>
+   </enrollment>
     <config-profile>ubuntu, ubuntu24, ubuntu24.04</config-profile>
     <notify_time>10</notify_time>
     <time-reconnect>60</time-reconnect>

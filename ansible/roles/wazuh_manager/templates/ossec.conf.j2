@@ -289,10 +289,10 @@
     <purge>yes</purge>
     <use_password>no</use_password>
     <ciphers>HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH</ciphers>
-    <!-- <ssl_agent_ca></ssl_agent_ca> -->
-    <ssl_verify_host>no</ssl_verify_host>
-    <ssl_manager_cert>etc/sslmanager.cert</ssl_manager_cert>
-    <ssl_manager_key>etc/sslmanager.key</ssl_manager_key>
+    <ssl_agent_ca>/etc/ssl/root-ca.crt</ssl_agent_ca>
+    <ssl_verify_host>yes</ssl_verify_host>
+    <ssl_manager_cert>/etc/ssl/auth.crt</ssl_manager_cert>
+    <ssl_manager_key>/etc/ssl/auth.key</ssl_manager_key>
     <ssl_auto_negotiate>no</ssl_auto_negotiate>
   </auth>
 
