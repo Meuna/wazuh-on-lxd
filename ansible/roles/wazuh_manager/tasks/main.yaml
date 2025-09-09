@@ -87,7 +87,7 @@
     name: wazuh.manager
     image: wazuh/wazuh-manager:4.12.0
     published_ports:
-      - '{{ syslog_port }}:{{ syslog_port }}'
+      - '127.0.0.1:{{ syslog_port }}:{{ syslog_port }}'
       - '{{ agent_com_port }}:{{ agent_com_port }}'
       - '{{ agent_enrollment_port }}:{{ agent_enrollment_port }}'
       - '{{ wazuh_api_port }}:{{ wazuh_api_port }}'

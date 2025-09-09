@@ -4,6 +4,9 @@ wazuh.wazuh.local
 [wazuh_manager]
 wazuh.wazuh.local
 
+[syslog_server]
+wazuh.wazuh.local
+
 [wazuh_indexer]
 wazuh.wazuh.local
 

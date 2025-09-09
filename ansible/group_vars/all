@@ -5,6 +5,7 @@ pki_locality: Toulouse
 domain: wazuh.local
 indexer_port: '9200'
 syslog_port: '514'
+syslog_over_tls_port: '6514'
 agent_com_port: '1514'
 agent_enrollment_port: '1515'
 cluster_port: '1516'

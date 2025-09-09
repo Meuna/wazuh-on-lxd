@@ -1,0 +1,28 @@
+# Define a ruleset for TCP input logs
+module(load="imtcp")
+
+ruleset(name="tcp-forwarding") {
+    action(
+        type="omfwd"
+        protocol="tcp"
+        target="127.0.0.1"
+        port="{{ syslog_port }}"
+        queue.type="linkedList"
+    )
+}
+
+# Bind TCP input to the above ruleset
+input(
+    type="imtcp"
+    port="{{ syslog_over_tls_port }}"
+    ruleset="tcp-forwarding"
+    streamDriver.Name="gtls"
+    streamDriver.Mode="1"
+    streamDriver.AuthMode="x509/name"
+    streamDriver.PrioritizeSAN="on"
+    streamDriver.checkExtendedKeyPurpose="on"
+    streamDriver.CAFile="/etc/ssl/certs/wazuh-ca.pem"
+    streamDriver.KeyFile="/etc/rsyslog.d/rsyslog-server.key"
+    streamDriver.CertFile="/etc/rsyslog.d/rsyslog-server.crt"
+    permittedPeer=[{{ groups['syslog_client'] | map('to_json') | join(',') }}]
+)

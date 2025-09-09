@@ -8,15 +8,15 @@
 
 - ansible.builtin.include_tasks: tls.yaml
   vars:
-    key: /etc/rsyslog.d/rsyslog-client.key
-    crt: /etc/rsyslog.d/rsyslog-client.crt
+    key: /etc/rsyslog.d/rsyslog-server.key
+    crt: /etc/rsyslog.d/rsyslog-server.crt
     cn: 'rsyslog - {{ inventory_hostname }}'
-    eku: ['clientAuth']
+    eku: ['serverAuth']
 
-- name: create forward.conf file
+- name: create tcptls-and-forward.conf file
   ansible.builtin.template:
-    src: forward.conf.j2
-    dest: /etc/rsyslog.d/forward.conf
+    src: tcptls-and-forward.conf.j2
+    dest: /etc/rsyslog.d/tcptls-and-forward.conf
     owner: root
     group: root
     mode: '0644'

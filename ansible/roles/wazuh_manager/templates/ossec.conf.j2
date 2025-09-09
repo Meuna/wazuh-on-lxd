@@ -35,7 +35,7 @@
     <connection>syslog</connection>
     <port>{{ syslog_port }}</port>
     <protocol>tcp</protocol>
-    <allowed-ips>{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}</allowed-ips>
+    <allowed-ips>0.0.0.0/0</allowed-ips>
     <local_ip>0.0.0.0</local_ip>
   </remote>
 

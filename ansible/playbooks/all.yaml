@@ -26,6 +26,12 @@
   roles:
     - wazuh_manager
 
+- hosts: syslog_server
+  become: true
+
+  roles:
+    - syslog_server
+
 - hosts: wazuh_dashboard
   become: true
 
