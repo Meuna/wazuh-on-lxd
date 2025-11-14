@@ -19,3 +19,4 @@ wazuh-client.wazuh.local
 
 [syslog_client]
 syslog-client.wazuh.local
+wazuh-client.wazuh.local
