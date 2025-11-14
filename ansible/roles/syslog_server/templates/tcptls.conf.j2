@@ -1,13 +1,11 @@
 # Define a ruleset for TCP input logs
 module(load="imtcp")
 
-ruleset(name="tcp-forwarding") {
+ruleset(name="syslog-server") {
     action(
-        type="omfwd"
-        protocol="tcp"
-        target="127.0.0.1"
-        port="{{ syslog_port }}"
-        queue.type="linkedList"
+        type="omfile"
+        File="{{ syslog_server_file }}"
+        template="RSYSLOG_TraditionalFileFormat"
     )
 }
 
@@ -15,7 +13,7 @@ ruleset(name="tcp-forwarding") {
 input(
     type="imtcp"
     port="{{ syslog_over_tls_port }}"
-    ruleset="tcp-forwarding"
+    ruleset="syslog-server"
     streamDriver.Name="gtls"
     streamDriver.Mode="1"
     streamDriver.AuthMode="x509/name"

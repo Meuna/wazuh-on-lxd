@@ -11,4 +11,5 @@ agent_enrollment_port: '1515'
 cluster_port: '1516'
 wazuh_api_port: '55000'
 dashboard_port: '5601'
-mainpw: easypass
+mainpw: ertdfgcvb
+syslog_server_file: /var/log/syslog-server/syslog

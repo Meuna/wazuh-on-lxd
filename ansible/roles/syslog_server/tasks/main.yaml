@@ -13,10 +13,18 @@
     cn: 'rsyslog - {{ inventory_hostname }}'
     eku: ['serverAuth']
 
-- name: create tcptls-and-forward.conf file
+- name: create /etc/wazuh folder
+  ansible.builtin.file:
+    path: '{{ syslog_server_file | dirname }}'
+    state: directory
+    owner: syslog
+    group: adm
+    mode: '0755'
+
+- name: create tcptls.conf file
   ansible.builtin.template:
-    src: tcptls-and-forward.conf.j2
-    dest: /etc/rsyslog.d/tcptls-and-forward.conf
+    src: tcptls.conf.j2
+    dest: /etc/rsyslog.d/tcptls.conf
     owner: root
     group: root
     mode: '0644'

@@ -22,6 +22,12 @@
         name: pki
         tasks_from: trust
 
+- hosts: syslog_server
+  become: true
+
+  roles:
+    - syslog_server
+
 - hosts: wazuh_indexer
   become: true
 
@@ -33,12 +39,6 @@
 
   roles:
     - wazuh_manager
-
-- hosts: syslog_server
-  become: true
-
-  roles:
-    - syslog_server
 
 - hosts: wazuh_dashboard
   become: true
