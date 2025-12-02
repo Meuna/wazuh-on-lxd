@@ -21,10 +21,19 @@
     group: adm
     mode: '0755'
 
-- name: create tcptls.conf file
+- name: create rsyslog tcptls.conf file
   ansible.builtin.template:
-    src: tcptls.conf.j2
+    src: rsyslog.conf.j2
     dest: /etc/rsyslog.d/tcptls.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart rsyslog
+
+- name: create logrotate tcptls.conf file
+  ansible.builtin.template:
+    src: logrotate.conf.j2
+    dest: /etc/logrotate.d/tcptls.conf
     owner: root
     group: root
     mode: '0644'

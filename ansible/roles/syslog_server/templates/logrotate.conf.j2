@@ -1,0 +1,11 @@
+{{ syslog_server_file }}
+{
+    size 1M
+    rotate 1
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+        /usr/lib/rsyslog/rsyslog-rotate
+    endscript
+}
